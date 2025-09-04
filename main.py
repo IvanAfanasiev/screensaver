@@ -22,23 +22,19 @@ def show_BG():
     window.setStyleSheet("background-color: black;")
     sys.exit(app.exec_())
 
-def on_move(x, y):
-    global user_active
-    user_active = True
-    return False  # stop listener
-def on_key_pressed(key):
+def on_any_activity():
     global user_active
     user_active = True
     return False  # stop listener
 
 def main():
     mouse_listener = mouse.Listener(
-        on_move=on_move, 
-        on_click=lambda *a: on_move(x, y), 
-        on_scroll=lambda *a: on_move(x, y)
+        on_move=on_any_activity, 
+        on_click=on_any_activity, 
+        on_scroll=on_any_activity
         )
     mouse_listener.start()
-    keyboard_listener = keyboard.Listener(on_press=on_key_pressed)
+    keyboard_listener = keyboard.Listener(on_press=on_any_activity)
     keyboard_listener.start()
 
     threading.Thread(target=show_BG, daemon=True).start()
