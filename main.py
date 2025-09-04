@@ -5,10 +5,22 @@ import random
 from ctypes import *
 from ctypes.wintypes import *
 from pynput import mouse, keyboard
+from PyQt5.QtWidgets import QApplication, QWidget
+import sys
+import threading
+
 
 user_active = False
 user32 = ctypes.windll.user32
 user_active = False
+
+def show_BG():
+    app = QApplication(sys.argv)
+    window = QWidget()
+    window.setWindowTitle("screensaver Black")
+    window.showFullScreen()
+    window.setStyleSheet("background-color: black;")
+    sys.exit(app.exec_())
 
 def on_move(x, y):
     global user_active
@@ -28,6 +40,8 @@ def main():
     mouse_listener.start()
     keyboard_listener = keyboard.Listener(on_press=on_key_pressed)
     keyboard_listener.start()
+
+    threading.Thread(target=show_BG, daemon=True).start()
 
     #screen size
     screen_width = user32.GetSystemMetrics(0)
