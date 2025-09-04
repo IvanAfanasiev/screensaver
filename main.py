@@ -4,11 +4,31 @@ import pyautogui
 import random
 from ctypes import *
 from ctypes.wintypes import *
+from pynput import mouse, keyboard
 
 user_active = False
 user32 = ctypes.windll.user32
+user_active = False
+
+def on_move(x, y):
+    global user_active
+    user_active = True
+    return False  # stop listener
+def on_key_pressed(key):
+    global user_active
+    user_active = True
+    return False  # stop listener
 
 def main():
+    mouse_listener = mouse.Listener(
+        on_move=on_move, 
+        on_click=lambda *a: on_move(x, y), 
+        on_scroll=lambda *a: on_move(x, y)
+        )
+    mouse_listener.start()
+    keyboard_listener = keyboard.Listener(on_press=on_key_pressed)
+    keyboard_listener.start()
+
     #screen size
     screen_width = user32.GetSystemMetrics(0)
     screen_height = user32.GetSystemMetrics(1)
@@ -22,7 +42,8 @@ def main():
     dir_x, dir_y = random.randint(2, 5), random.randint(3, 5)
     fps = 60
 
-    while True:
+    # mouse movement = the exit trigger
+    while not user_active:
         x += dir_x
         y += dir_y
 
