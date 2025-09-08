@@ -10,16 +10,24 @@ import sys
 import threading
 
 from tray import start_tray
+from window import BackgroundWindow, SettingsWindow
 
 
 user32 = ctypes.windll.user32
 window_visible = False
 user_active = False
+main_window = None
+settings_window = None
+app = None
 
-app = QApplication(sys.argv)
-window = QWidget()
-window.setWindowTitle("screensaver Black")
-window.setStyleSheet("background-color: black;")
+def create_window():
+    global app
+    global main_window
+    global settings_window
+
+    app = QApplication(sys.argv)
+    main_window = BackgroundWindow()
+    settings_window = SettingsWindow()
 
 def start_animation():
     #screen size
@@ -66,14 +74,14 @@ def start_animation():
 def hide_window():
     global window_visible
     if window_visible:
-        window.hide()
+        main_window.hide()
         window_visible = False
 
 def show_window():
     global window_visible
     global user_active
     if not window_visible:
-        window.showFullScreen()
+        main_window.show()
         user_active = False
         try:
             threading.Thread(target=start_animation, daemon=True).start()
@@ -81,7 +89,10 @@ def show_window():
             hide_window()
             pass
         window_visible = True
-        
+
+def show_setting():
+    settings_window.show() 
+
 def on_any_activity():
     global user_active
     user_active = True
@@ -101,9 +112,17 @@ def start_listeners():
     keyboard_listener.start()
 
 def main():
+    create_window()
+
     threading.Thread(target=start_listeners, daemon=True).start()
 
-    tray = start_tray(app, on_quit_callback=close, on_play_callback=show_window)
+    tray = start_tray(
+        app, 
+        on_quit_callback=close, 
+        on_start_callback=show_window,
+        on_show_settings=show_setting
+        )
+    
     sys.exit(app.exec_())
 
 if __name__ == "__main__":

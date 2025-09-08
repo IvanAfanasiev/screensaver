@@ -17,16 +17,21 @@ def create_icon():
 
     return QIcon(pixmap)
 
-def start_tray(app, on_quit_callback=None, on_play_callback=None):
+def start_tray(app, on_quit_callback=None, on_start_callback=None, on_show_settings=None):
     tray = QSystemTrayIcon()
     tray.setIcon(create_icon()) 
     tray.setToolTip("Screensaver")
     menu = QMenu()
 
-    play_action = QAction("Play", app)
-    if on_play_callback:
-        play_action.triggered.connect(on_play_callback)
-    menu.addAction(play_action)
+    start_action = QAction("Start", app)
+    if on_start_callback:
+        start_action.triggered.connect(on_start_callback)
+    menu.addAction(start_action)
+
+    settings_action = QAction("Settings", app)
+    if on_show_settings:
+        settings_action.triggered.connect(on_show_settings)
+    menu.addAction(settings_action)
 
     quit_action = QAction("Quit", app)
     if on_quit_callback:

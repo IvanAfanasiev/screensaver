@@ -29,7 +29,7 @@ The app will minimize to the tray after launch.
 
 # Usage
 
-- ▶ Start screensaver — via tray icon → "Start / Play"
+- ▶ Start screensaver — via tray icon → "Start"
 - ❌ Quit app — via tray icon → "Quit"
 - 🙈 Any keyboard or mouse activity hides the screensaver window.
 
