@@ -5,10 +5,12 @@ import random
 from ctypes import *
 from ctypes.wintypes import *
 from pynput import mouse, keyboard
-from PyQt5.QtWidgets import QApplication, QWidget
+from PyQt5.QtWidgets import QApplication
+from PyQt5.QtCore import QObject, pyqtSignal
 import sys
 import threading
 
+from storage import Storage
 from tray import start_tray
 from window import BackgroundWindow, SettingsWindow
 
@@ -20,7 +22,9 @@ main_window = None
 settings_window = None
 app = None
 
-def create_window():
+storage = Storage()
+
+def create_windows():
     global app
     global main_window
     global settings_window
@@ -71,7 +75,7 @@ def start_animation():
         SetCursorPos(x, y)
         time.sleep(1 / fps * speed)
 
-def hide_window():
+def hide_main_window():
     global window_visible
     if window_visible:
         main_window.hide()
@@ -86,7 +90,7 @@ def show_window():
         try:
             threading.Thread(target=start_animation, daemon=True).start()
         except:
-            hide_window()
+            hide_main_window()
             pass
         window_visible = True
 
@@ -96,7 +100,7 @@ def show_setting():
 def on_any_activity():
     global user_active
     user_active = True
-    hide_window()
+    hide_main_window()
 
 def close():
     app.quit()
@@ -111,8 +115,19 @@ def start_listeners():
     keyboard_listener = keyboard.Listener(on_press=on_any_activity)
     keyboard_listener.start()
 
+class Loader(QObject):
+    finished = pyqtSignal()
+
+    def run(self):
+        storage.copy_defaults()
+        storage.update_settings()
+        self.finished.emit()
+
 def main():
-    create_window()
+    storage.copy_defaults()
+    storage.update_settings()
+
+    create_windows()
 
     threading.Thread(target=start_listeners, daemon=True).start()
 
